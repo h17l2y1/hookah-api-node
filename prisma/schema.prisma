@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "windows", "darwin", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ImageType {
+  None
+  Brand
+  Tobacco
+}
+
+model Brand {
+  id          Int      @id @default(autoincrement()) @map("Id")
+  name        String   @map("Name")
+  description String?  @map("Description")
+  countryId   Int      @map("CountryId")
+  imageId     Int      @map("ImageId")
+
+  country     Country  @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  image       Image    @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  lines       Line[]
+  tobaccos    Tobacco[]
+
+  @@index([countryId])
+  @@index([imageId])
+  @@map("Brands")
+}
+
+model Country {
+  id    Int     @id @default(autoincrement()) @map("Id")
+  name  String  @map("Name")
+  brands Brand[]
+
+  @@map("Countries")
+}
+
+model Image {
+  id    Int     @id @default(autoincrement()) @map("Id")
+  name  String  @map("Name")
+  link  String  @map("Link")
+  type  ImageType  @map("Type")
+
+  brands  Brand[]
+  tobaccos Tobacco[]
+
+  @@map("Images")
+}
+
+model Line {
+  id          Int      @id @default(autoincrement()) @map("Id")
+  name        String   @map("Name")
+  description String?  @map("Description")
+  brandId     Int      @map("BrandId")
+
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  tobaccos    Tobacco[]
+
+  @@index([brandId])
+  @@map("Lines")
+}
+
+model Heaviness {
+  id    Int     @id @default(autoincrement()) @map("Id")
+  name  String  @map("Name")
+  value Int     @map("Value")
+
+  tobaccos Tobacco[]
+
+  @@map("Heaviness")
+}
+
+model Tag {
+  id          Int          @id @default(autoincrement()) @map("Id")
+  name        String       @map("Name")
+  color       String       @map("Color")
+  isGlobal    Boolean      @default(false) @map("IsGlobal")
+  tobaccoTags TobaccoTag[]
+
+  @@map("Tags")
+}
+
+model TobaccoTag {
+  id        Int     @id @default(autoincrement()) @map("Id")
+  tagId     Int     @map("TagId")
+  tobaccoId Int     @map("TobaccoId")
+
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Restrict)
+  tobacco   Tobacco @relation(fields: [tobaccoId], references: [id], onDelete: Restrict)
+
+  @@index([tagId])
+  @@index([tobaccoId])
+  @@map("TobaccoTags")
+}
+
+model TobaccoMix {
+  id        Int     @id @default(autoincrement()) @map("Id")
+  tobaccoId Int     @map("TobaccoId")
+  mixId     Int?    @map("MixId")
+  percent   Int     @map("Percent")
+
+  tobacco   Tobacco @relation(fields: [tobaccoId], references: [id], onDelete: Restrict)
+  mix       Mix?    @relation(fields: [mixId], references: [id], onDelete: Restrict)
+
+  @@index([tobaccoId])
+  @@index([mixId])
+  @@map("TobaccoMixes")
+}
+
+model Tobacco {
+  id          Int          @id @default(autoincrement()) @map("Id")
+  name        String       @map("Name")
+  description String?      @map("Description")
+  lineId      Int          @map("LineId")
+  imageId     Int?         @map("ImageId")
+  heavinessId Int          @map("HeavinessId")
+  brandId     Int          @map("BrandId")
+  rating      Float        @default(0) @map("Rating")
+
+  line        Line         @relation(fields: [lineId], references: [id], onDelete: Restrict)
+  image       Image?       @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  heaviness   Heaviness    @relation(fields: [heavinessId], references: [id], onDelete: Restrict)
+  brand       Brand        @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  tobaccoTags TobaccoTag[]
+  tobaccoMixes TobaccoMix[]
+  reviews     Review[]
+
+  @@index([lineId])
+  @@index([imageId])
+  @@index([heavinessId])
+  @@index([brandId])
+  @@map("Tobaccos")
+}
+
+model Mix {
+  id          Int          @id @default(autoincrement()) @map("Id")
+  name        String       @map("Name")
+  rating      Float        @default(0) @map("Rating")
+
+  tobaccoMixes TobaccoMix[]
+  reviews     Review[]
+
+  @@map("Mixes")
+}
+
+model Review {
+  id           Int      @id @default(autoincrement()) @map("Id")
+  tobaccoId    Int?     @map("TobaccoId")
+  mixId        Int?     @map("MixId")
+  userId       String?  @map("UserId")
+  anonymousName String?  @map("AnonymousName")
+  isAnonymous  Boolean  @map("IsAnonymous")
+  rating       Float    @map("Rating")
+  comment      String?  @map("Comment")
+  creationDate DateTime @default(now()) @map("CreationDate")
+
+  tobacco      Tobacco? @relation(fields: [tobaccoId], references: [id], onDelete: Restrict)
+  mix          Mix?     @relation(fields: [mixId], references: [id], onDelete: Restrict)
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([tobaccoId])
+  @@index([mixId])
+  @@index([userId])
+  @@map("Reviews")
+}
+
+model User {
+  id            String        @id @default(cuid()) @map("Id")
+  creationDate  DateTime      @default(now()) @map("CreationDate")
+  firstName     String        @map("FirstName")
+  lastName      String        @map("LastName")
+  email         String?       @unique @map("Email")
+  password      String        @map("Password")
+  passwordHash  String        @map("PasswordHash")
+  role          String        @map("Role")
+  userName      String?       @map("UserName")
+
+  reviews       Review[]
+  refreshTokens RefreshToken[]
+
+  @@map("Users")
+}
+
+model RefreshToken {
+  id          Int      @id @default(autoincrement()) @map("Id")
+  expiredDate DateTime @map("ExpiredDate")
+  token       String   @unique @map("Token")
+  userId      String   @map("UserId")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@map("RefreshTokens")
+}
+
+model BlackListRefreshToken {
+  id    Int    @id @default(autoincrement()) @map("Id")
+  token String @unique @map("Token")
+
+  @@map("BlackListRefreshTokens")
+}

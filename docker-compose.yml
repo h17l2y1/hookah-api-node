@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    command: ["npm", "run", "start:prod"]
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: replace-me
+      JWT_ACCESS_EXPIRES_IN: 1h
+      JWT_REFRESH_EXPIRES_IN: 48h
+      PORT: 3000
+    ports:
+      - "3000:3000"
