@@ -1,6 +1,6 @@
 import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {JwtService} from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import {User} from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import {randomUUID} from 'crypto';
@@ -126,8 +126,14 @@ export class AuthService {
     const payload = this.createPayload(user);
 
     const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload, { secret, expiresIn: accessExpiresIn }),
-      this.jwtService.signAsync(payload, { secret, expiresIn: refreshExpiresIn }),
+      this.jwtService.signAsync(payload, {
+        secret,
+        expiresIn: accessExpiresIn as JwtSignOptions['expiresIn'],
+      }),
+      this.jwtService.signAsync(payload, {
+        secret,
+        expiresIn: refreshExpiresIn as JwtSignOptions['expiresIn'],
+      }),
     ]);
 
     return {
