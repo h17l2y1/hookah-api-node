@@ -15,15 +15,15 @@ export class ImagesService {
 
     return {
       id: entity.id,
-      Name: entity.name,
-      Link: entity.link,
-      Type: entity.type as ImageType,
+      name: entity.name,
+      link: entity.link,
+      type: entity.type as ImageType,
     };
   }
 
   async create(request: CreateImageRequestDto): Promise<void> {
     await this.prisma.image.create({
-      data: { name: request.Name.trim(), link: request.Base64.trim(), type: request.Type },
+      data: { name: request.name.trim(), link: request.base64.trim(), type: request.type },
     });
   }
 
@@ -31,9 +31,9 @@ export class ImagesService {
     await this.prisma.image.update({
       where: { id: request.id },
       data: {
-        name: request.Name.trim(),
-        ...(request.Link ? { link: request.Link.trim() } : {}),
-        ...(request.Type ? { type: request.Type } : {}),
+        name: request.name.trim(),
+        ...(request.link ? { link: request.link.trim() } : {}),
+        ...(request.type ? { type: request.type } : {}),
       },
     });
   }

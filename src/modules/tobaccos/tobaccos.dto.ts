@@ -14,162 +14,162 @@ import { GetReviewResponseDto } from '../reviews/reviews.dto';
 export class TobaccoTagCreateDto {
   @IsOptional()
   @IsString()
-  Id?: string | null;
+  id?: string | null;
 
   @IsString()
-  TagId!: string;
+  tagId!: string;
 
   @IsOptional()
   @IsString()
-  TobaccoId?: string | null;
+  tobaccoId?: string | null;
 
   @IsOptional()
   @IsBoolean()
-  IsNew?: boolean | null;
+  isNew?: boolean | null;
 
   @IsOptional()
   @IsBoolean()
-  IsRemoved?: boolean | null;
+  isRemoved?: boolean | null;
 }
 
 export class UpdateTobaccoTagDto {
   @IsOptional()
   @IsString()
-  Id?: string | null;
+  id?: string | null;
 
   @IsString()
-  TagId!: string;
+  tagId!: string;
 
   @IsString()
-  TobaccoId!: string;
+  tobaccoId!: string;
 
   @IsOptional()
   @IsBoolean()
-  IsNew?: boolean | null;
+  isNew?: boolean | null;
 
   @IsOptional()
   @IsBoolean()
-  IsRemoved?: boolean | null;
+  isRemoved?: boolean | null;
 }
 
 export class TobaccoTagRequestDto {
   @IsOptional()
   @IsString()
-  Id?: string | null;
+  id?: string | null;
 
   @IsString()
-  TagId!: string;
+  tagId!: string;
 
   @IsString()
-  TobaccoId!: string;
+  tobaccoId!: string;
 
   @IsOptional()
   @IsBoolean()
-  IsNew?: boolean | null;
+  isNew?: boolean | null;
 
   @IsOptional()
   @IsBoolean()
-  IsRemoved?: boolean | null;
+  isRemoved?: boolean | null;
 }
 
 export class GetBrandInnerDto {
   id!: number;
-  Name!: string;
+  name!: string;
 }
 
 export class TobaccoMixResponseDto {
   id!: number;
-  TobaccoId!: string;
-  Percent!: number;
+  tobaccoId!: string;
+  percent!: number;
 }
 
 export class CreateTobaccoMixRequestDto {
   @IsString()
-  TobaccoId!: string;
+  tobaccoId!: string;
 
   @IsNumber()
-  Percent!: number;
+  percent!: number;
 }
 
 export class GetTobaccoResponseDto {
   id!: number;
-  Name!: string;
-  Description?: string | null;
-  LineId!: string;
-  BrandId!: string;
-  HeavinessId!: string;
-  Rating!: number;
-  RatingCount!: number;
-  CommentsCount!: number;
-  Image?: GetImageResponseDto | null;
-  Brand?: GetBrandInnerDto | null;
-  Tags?: GetTagResponseDto[] | null;
-  TobaccoTags?: TobaccoTagRequestDto[] | null;
-  Reviews?: GetReviewResponseDto[] | null;
+  name!: string;
+  description?: string | null;
+  lineId!: string;
+  brandId!: string;
+  heavinessId!: string;
+  rating!: number;
+  ratingCount!: number;
+  commentsCount!: number;
+  image?: GetImageResponseDto | null;
+  brand?: GetBrandInnerDto | null;
+  tags?: GetTagResponseDto[] | null;
+  tobaccoTags?: TobaccoTagRequestDto[] | null;
+  reviews?: GetReviewResponseDto[] | null;
 }
 
 export class CreateTobaccoRequestDto {
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
-  Description?: string | null;
+  description?: string | null;
 
   @IsString()
-  LineId!: string;
+  lineId!: string;
 
   @IsString()
-  BrandId!: string;
+  brandId!: string;
 
   @IsString()
-  HeavinessId!: string;
+  heavinessId!: string;
 
   @ValidateNested()
   @Type(() => CreateImageRequestDto)
-  Image!: CreateImageRequestDto;
+  image!: CreateImageRequestDto;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => TobaccoTagCreateDto)
-  TobaccoTags?: TobaccoTagCreateDto[] | null;
+  tobaccoTags?: TobaccoTagCreateDto[] | null;
 }
 
 export class UpdateTobaccoRequestDto {
   id!: number;
 
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
-  Description?: string | null;
+  description?: string | null;
 
   @IsString()
-  LineId!: string;
+  lineId!: string;
 
   @IsString()
-  HeavinessId!: string;
+  heavinessId!: string;
 
   @IsString()
-  BrandId!: string;
+  brandId!: string;
 
   @IsOptional()
   @IsNumber()
-  Rating?: number | null;
+  rating?: number | null;
 
   @ValidateNested()
   @Type(() => UpdateImageRequestDto)
-  Image!: UpdateImageRequestDto;
+  image!: UpdateImageRequestDto;
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => UpdateTobaccoTagDto)
-  TobaccoTags!: UpdateTobaccoTagDto[];
+  tobaccoTags!: UpdateTobaccoTagDto[];
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => GetTagResponseDto)
-  Tags!: GetTagResponseDto[];
+  tags!: GetTagResponseDto[];
 }

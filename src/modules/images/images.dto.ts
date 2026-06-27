@@ -3,37 +3,37 @@ import { ImageType } from '../../common/enums/image-type.enum';
 
 export class GetImageResponseDto {
   id!: number;
-  Name!: string;
-  Link!: string;
-  Type!: ImageType;
+  name!: string;
+  link!: string;
+  type!: ImageType;
 }
 
 export class CreateImageRequestDto {
   @IsString()
-  Base64!: string;
+  base64!: string;
 
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsEnum(ImageType)
-  Type!: ImageType;
+  type!: ImageType;
 }
 
 export class UpdateImageRequestDto {
   id!: number;
 
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
-  Base64?: string;
+  base64?: string;
 
   @IsOptional()
   @IsString()
-  Link?: string;
+  link?: string;
 
   @IsOptional()
   @IsEnum(ImageType)
-  Type?: ImageType;
+  type?: ImageType;
 }

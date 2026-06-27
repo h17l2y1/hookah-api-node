@@ -11,90 +11,90 @@ import { GetLineResponseDto } from '../lines/lines.dto';
 
 export class GetCountryResponseDto {
   id!: number;
-  Name!: string;
+  name!: string;
 }
 
 export class GetBrandOptionDto {
   id!: number;
-  Name!: string;
+  name!: string;
 }
 
 export class GetBrandResponseDto {
   id!: number;
-  Name!: string;
-  Description?: string | null;
-  Country!: GetCountryResponseDto;
-  Image!: GetImageResponseDto;
-  Lines?: GetLineResponseDto[] | null;
+  name!: string;
+  description?: string | null;
+  country!: GetCountryResponseDto;
+  image!: GetImageResponseDto;
+  lines?: GetLineResponseDto[] | null;
 }
 
 export class LinesInnerDto {
   @IsOptional()
   @IsString()
-  Name?: string | null;
+  name?: string | null;
 
   @IsOptional()
   @IsString()
-  Description?: string | null;
+  description?: string | null;
 }
 
 export class LinesUpdateInnerDto {
   @IsOptional()
   @IsString()
-  Id?: string | null;
+  id?: string | null;
 
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsString()
-  BrandId!: string;
+  brandId!: string;
 
   @IsBoolean()
-  IsNew!: boolean;
+  isNew!: boolean;
 }
 
 export class CreateBrandRequestDto {
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
-  Description?: string | null;
+  description?: string | null;
 
   @IsString()
-  CountryId!: string;
+  countryId!: string;
 
   @ValidateNested()
   @Type(() => CreateImageRequestDto)
-  Image!: CreateImageRequestDto;
+  image!: CreateImageRequestDto;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => LinesInnerDto)
-  Lines?: LinesInnerDto[] | null;
+  lines?: LinesInnerDto[] | null;
 }
 
 export class UpdateBrandRequestDto {
   id!: number;
 
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
-  Description?: string | null;
+  description?: string | null;
 
   @IsString()
-  CountryId!: string;
+  countryId!: string;
 
   @ValidateNested()
   @Type(() => UpdateImageRequestDto)
-  Image!: UpdateImageRequestDto;
+  image!: UpdateImageRequestDto;
 
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => LinesUpdateInnerDto)
-  Lines?: LinesUpdateInnerDto[] | null;
+  lines?: LinesUpdateInnerDto[] | null;
 }

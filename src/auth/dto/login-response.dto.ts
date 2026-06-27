@@ -1,4 +1,4 @@
 export class LoginResponseDto {
-  AccessToken!: string;
-  RefreshToken!: string;
+  accessToken!: string;
+  refreshToken!: string;
 }

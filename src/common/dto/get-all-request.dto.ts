@@ -6,43 +6,43 @@ export class GetAllRequestDto {
   @Transform(({ value }) => Number(value ?? 0))
   @IsInt()
   @Min(0)
-  Page = 0;
+  page = 0;
 
   @IsOptional()
   @Transform(({ value }) => Number(value ?? 100))
   @IsInt()
   @Min(1)
-  Take = 100;
+  take = 100;
 
   @IsOptional()
   @IsString()
-  SortBy = 'asc';
+  sortBy = 'asc';
 
   @IsOptional()
   @IsString()
-  Column = 'name';
+  column = 'name';
 
   @IsOptional()
   @IsString()
-  Name?: string;
+  name?: string;
 
   @IsOptional()
   @IsString()
-  TagId?: string;
+  tagId?: string;
 
   @IsOptional()
   @IsString()
-  BrandId?: string;
+  brandId?: string;
 
   @IsOptional()
   @IsString()
-  CountryId?: string;
+  countryId?: string;
 
   @IsOptional()
   @IsString()
-  LineId?: string;
+  lineId?: string;
 
   @IsOptional()
   @IsString()
-  HeavinessId?: string;
+  heavinessId?: string;
 }

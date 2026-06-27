@@ -9,22 +9,22 @@ export class ReviewsService {
   async create(request: CreateReviewRequestDto): Promise<void> {
     const review = await this.prisma.review.create({
       data: {
-        tobaccoId: request.TobaccoId ?? null,
-        mixId: request.MixId ?? null,
-        userId: request.UserId ? String(request.UserId) : null,
-        anonymousName: request.Name ?? null,
-        isAnonymous: request.IsAnonymous,
-        rating: request.Rating,
-        comment: request.Comment ?? null,
+        tobaccoId: request.tobaccoId ?? null,
+        mixId: request.mixId ?? null,
+        userId: request.userId ? String(request.userId) : null,
+        anonymousName: request.name ?? null,
+        isAnonymous: request.isAnonymous,
+        rating: request.rating,
+        comment: request.comment ?? null,
       },
     });
 
-    if (request.TobaccoId != null) {
-      await this.updateTobaccoRating(request.TobaccoId);
+    if (request.tobaccoId != null) {
+      await this.updateTobaccoRating(request.tobaccoId);
     }
 
-    if (request.MixId != null) {
-      await this.updateMixRating(request.MixId);
+    if (request.mixId != null) {
+      await this.updateMixRating(request.mixId);
     }
 
     return review ? undefined : undefined;

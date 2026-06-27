@@ -28,14 +28,14 @@ export class MixesService {
 
   async create(request: MixRequestDto): Promise<void> {
     const mix = await this.prisma.mix.create({
-      data: { name: request.Name.trim() },
+      data: { name: request.name.trim() },
     });
 
-    if (request.TobaccoMixes.length) {
+    if (request.tobaccoMixes.length) {
       await this.prisma.tobaccoMix.createMany({
-        data: request.TobaccoMixes.map((item) => ({
-          tobaccoId: parseRequiredInt(item.TobaccoId),
-          percent: item.Percent,
+        data: request.tobaccoMixes.map((item) => ({
+          tobaccoId: parseRequiredInt(item.tobaccoId),
+          percent: item.percent,
           mixId: mix.id,
         })),
       });
@@ -43,8 +43,8 @@ export class MixesService {
   }
 
   async getAll(request: GetAllRequestDto): Promise<GetAllResponseDto<MixResponseDto>> {
-    const where: Prisma.MixWhereInput = request.Name
-      ? { name: { contains: request.Name.trim() } }
+    const where: Prisma.MixWhereInput = request.name
+      ? { name: { contains: request.name.trim() } }
       : {};
 
     const total = await this.prisma.mix.count({ where });
@@ -59,7 +59,7 @@ export class MixesService {
         reviews: { include: { user: true } },
         tobaccoMixes: true,
       },
-      orderBy: [{ name: sortDirection(request.SortBy) }],
+      orderBy: [{ name: sortDirection(request.sortBy) }],
       skip,
       take,
     });
@@ -69,27 +69,27 @@ export class MixesService {
 
   private mapMix(entity: any): MixResponseDto {
     const reviews = (entity.reviews ?? []).map((review: any) => ({
-      TobaccoId: review.tobaccoId ? String(review.tobaccoId) : null,
-      MixId: review.mixId ? String(review.mixId) : null,
-      UserId: review.userId ?? null,
-      IsAnonymous: review.isAnonymous,
-      Rating: review.rating,
-      Comment: review.comment ?? null,
-      Name: review.isAnonymous ? (review.anonymousName ?? '') : `${review.user?.firstName ?? ''} ${review.user?.lastName ?? ''}`.trim(),
-      CreationDate: review.creationDate,
+      tobaccoId: review.tobaccoId ? String(review.tobaccoId) : null,
+      mixId: review.mixId ? String(review.mixId) : null,
+      userId: review.userId ?? null,
+      isAnonymous: review.isAnonymous,
+      rating: review.rating,
+      comment: review.comment ?? null,
+      name: review.isAnonymous ? (review.anonymousName ?? '') : `${review.user?.firstName ?? ''} ${review.user?.lastName ?? ''}`.trim(),
+      creationDate: review.creationDate,
     }));
 
     return {
       id: entity.id,
-      Name: entity.name,
-      Rating: entity.rating,
-      RatingCount: reviews.length,
-      CommentsCount: reviews.filter((review: any) => review.Comment != null).length,
-      Reviews: reviews,
-      TobaccoMixes: (entity.tobaccoMixes ?? []).map((item: any) => ({
+      name: entity.name,
+      rating: entity.rating,
+      ratingCount: reviews.length,
+      commentsCount: reviews.filter((review: any) => review.comment != null).length,
+      reviews,
+      tobaccoMixes: (entity.tobaccoMixes ?? []).map((item: any) => ({
         id: item.id,
-        TobaccoId: String(item.tobaccoId),
-        Percent: item.percent,
+        tobaccoId: String(item.tobaccoId),
+        percent: item.percent,
       })),
     };
   }

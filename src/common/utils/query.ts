@@ -3,8 +3,8 @@ import { parsePositiveInt } from './ids';
 
 export function getPaging(request: GetAllRequestDto) {
   return {
-    skip: request.Page * request.Take,
-    take: request.Take,
+    skip: request.page * request.take,
+    take: request.take,
   };
 }
 

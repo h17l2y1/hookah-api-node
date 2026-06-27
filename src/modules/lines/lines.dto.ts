@@ -2,28 +2,28 @@ import { IsString } from 'class-validator';
 
 export class GetLineResponseDto {
   id!: number;
-  Name!: string;
-  BrandId!: string;
+  name!: string;
+  brandId!: string;
 }
 
 export class CreateLineRequestDto {
   @IsString()
-  Name!: string;
+  name!: string;
 
-  Description?: string | null;
+  description?: string | null;
 
   @IsString()
-  BrandId!: string;
+  brandId!: string;
 }
 
 export class UpdateLineRequestDto {
   id!: number;
 
   @IsString()
-  Name!: string;
+  name!: string;
 
-  Description?: string | null;
+  description?: string | null;
 
   @IsString()
-  BrandId!: string;
+  brandId!: string;
 }

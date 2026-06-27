@@ -1,4 +1,4 @@
 export class GetHeavinessResponseDto {
   id!: number;
-  Name!: string;
+  name!: string;
 }

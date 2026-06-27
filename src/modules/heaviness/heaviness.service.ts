@@ -8,6 +8,6 @@ export class HeavinessService {
 
   async getOptions(): Promise<GetHeavinessResponseDto[]> {
     const entities = await this.prisma.heaviness.findMany({ orderBy: { value: 'asc' } });
-    return entities.map((entity) => ({ id: entity.id, Name: entity.name }));
+    return entities.map((entity) => ({ id: entity.id, name: entity.name }));
   }
 }

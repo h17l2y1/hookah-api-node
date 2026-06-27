@@ -2,31 +2,31 @@ import { IsBoolean, IsString } from 'class-validator';
 
 export class GetTagResponseDto {
   id?: string | null;
-  Name!: string;
-  Color!: string;
-  IsGlobal!: boolean;
+  name!: string;
+  color!: string;
+  isGlobal!: boolean;
 }
 
 export class CreateTagRequestDto {
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsString()
-  Color!: string;
+  color!: string;
 
   @IsBoolean()
-  IsGlobal!: boolean;
+  isGlobal!: boolean;
 }
 
 export class UpdateTagRequestDto {
   id!: number;
 
   @IsString()
-  Name!: string;
+  name!: string;
 
   @IsString()
-  Color!: string;
+  color!: string;
 
   @IsBoolean()
-  IsGlobal!: boolean;
+  isGlobal!: boolean;
 }

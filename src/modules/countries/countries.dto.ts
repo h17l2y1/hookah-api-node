@@ -2,17 +2,17 @@ import { IsString } from 'class-validator';
 
 export class GetCountryResponseDto {
   id!: number;
-  Name!: string;
+  name!: string;
 }
 
 export class CreateCountryRequestDto {
   @IsString()
-  Name!: string;
+  name!: string;
 }
 
 export class UpdateCountryRequestDto {
   id!: number;
 
   @IsString()
-  Name!: string;
+  name!: string;
 }

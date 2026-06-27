@@ -1,9 +1,9 @@
 export class GetAllResponseDto<T> {
   constructor(total = 0, list: T[] = []) {
-    this.Total = total;
-    this.List = list;
+    this.total = total;
+    this.list = list;
   }
 
-  Total: number;
-  List: T[];
+  total: number;
+  list: T[];
 }

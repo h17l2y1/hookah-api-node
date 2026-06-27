@@ -1,32 +1,32 @@
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class GetReviewResponseDto {
-  TobaccoId?: string | null;
-  MixId?: string | null;
-  UserId?: string | null;
-  IsAnonymous!: boolean;
-  Rating!: number;
-  Comment?: string | null;
-  Name!: string;
-  CreationDate!: Date;
+  tobaccoId?: string | null;
+  mixId?: string | null;
+  userId?: string | null;
+  isAnonymous!: boolean;
+  rating!: number;
+  comment?: string | null;
+  name!: string;
+  creationDate!: Date;
 }
 
 export class CreateReviewRequestDto {
-  TobaccoId?: number | null;
-  MixId?: number | null;
-  UserId?: number | null;
+  tobaccoId?: number | null;
+  mixId?: number | null;
+  userId?: number | null;
 
   @IsOptional()
   @IsString()
-  Name?: string | null;
+  name?: string | null;
 
   @IsBoolean()
-  IsAnonymous!: boolean;
+  isAnonymous!: boolean;
 
   @IsNumber()
-  Rating!: number;
+  rating!: number;
 
   @IsOptional()
   @IsString()
-  Comment?: string | null;
+  comment?: string | null;
 }

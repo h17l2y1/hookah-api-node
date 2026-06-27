@@ -13,15 +13,15 @@ export class LinesService {
       throw new NotFoundException(`${id} doesn't exist`);
     }
 
-    return { id: entity.id, Name: entity.name, BrandId: String(entity.brandId) };
+    return { id: entity.id, name: entity.name, brandId: String(entity.brandId) };
   }
 
   async create(request: CreateLineRequestDto): Promise<void> {
     await this.prisma.line.create({
       data: {
-        name: request.Name.trim(),
-        description: request.Description ?? null,
-        brandId: parseRequiredInt(request.BrandId),
+        name: request.name.trim(),
+        description: request.description ?? null,
+        brandId: parseRequiredInt(request.brandId),
       },
     });
   }
@@ -30,9 +30,9 @@ export class LinesService {
     await this.prisma.line.update({
       where: { id: request.id },
       data: {
-        name: request.Name.trim(),
-        description: request.Description ?? null,
-        brandId: parseRequiredInt(request.BrandId),
+        name: request.name.trim(),
+        description: request.description ?? null,
+        brandId: parseRequiredInt(request.brandId),
       },
     });
   }
@@ -46,6 +46,6 @@ export class LinesService {
       where: { brandId },
       orderBy: { name: 'asc' },
     });
-    return entities.map((entity) => ({ id: entity.id, Name: entity.name, BrandId: String(entity.brandId) }));
+    return entities.map((entity) => ({ id: entity.id, name: entity.name, brandId: String(entity.brandId) }));
   }
 }

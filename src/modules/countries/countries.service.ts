@@ -12,22 +12,22 @@ export class CountriesService {
       throw new NotFoundException(`${id} doesn't exist`);
     }
 
-    return { id: entity.id, Name: entity.name };
+    return { id: entity.id, name: entity.name };
   }
 
   async getOptions(): Promise<GetCountryResponseDto[]> {
     const entities = await this.prisma.country.findMany({ orderBy: { name: 'asc' } });
-    return entities.map((entity) => ({ id: entity.id, Name: entity.name }));
+    return entities.map((entity) => ({ id: entity.id, name: entity.name }));
   }
 
   async create(request: CreateCountryRequestDto): Promise<void> {
-    await this.prisma.country.create({ data: { name: request.Name.trim() } });
+    await this.prisma.country.create({ data: { name: request.name.trim() } });
   }
 
   async update(request: UpdateCountryRequestDto): Promise<void> {
     await this.prisma.country.update({
       where: { id: request.id },
-      data: { name: request.Name.trim() },
+      data: { name: request.name.trim() },
     });
   }
 

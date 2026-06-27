@@ -26,33 +26,33 @@ export class AuthService {
   ) {}
 
   async signUp(dto: SignUpDto): Promise<void> {
-    const email = dto.Email.trim();
+    const email = dto.email.trim();
     const exists = await this.prisma.user.findFirst({ where: { email } });
     if (exists) {
       throw new BadRequestException('Email already exist');
     }
 
-    const passwordHash = await bcrypt.hash(dto.Password, 10);
+    const passwordHash = await bcrypt.hash(dto.password, 10);
     await this.prisma.user.create({
       data: {
-        firstName: dto.FirstName.trim(),
-        lastName: dto.LastName.trim(),
+        firstName: dto.firstName.trim(),
+        lastName: dto.lastName.trim(),
         email,
-        password: dto.Password,
+        password: dto.password,
         passwordHash,
-        role: dto.Role.trim(),
-        userName: `${dto.FirstName.trim()}${dto.LastName.trim()}`,
+        role: dto.role.trim(),
+        userName: `${dto.firstName.trim()}${dto.lastName.trim()}`,
       },
     });
   }
 
   async login(dto: LoginDto): Promise<LoginResponseDto> {
-    const user = await this.findUserByEmail(dto.Email);
+    const user = await this.findUserByEmail(dto.email);
     if (!user) {
       throw new UnauthorizedException('User email does not found');
     }
 
-    const matches = await bcrypt.compare(dto.Password, user.passwordHash);
+    const matches = await bcrypt.compare(dto.password, user.passwordHash);
     if (!matches) {
       throw new UnauthorizedException('Password error');
     }
@@ -67,15 +67,15 @@ export class AuthService {
     });
 
     return {
-      AccessToken: tokenPair.accessToken,
-      RefreshToken: tokenPair.refreshToken,
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
     };
   }
 
   async refreshAuthToken(dto: RefreshTokenRequestDto): Promise<LoginResponseDto> {
-    const payload = await this.verifyRefreshToken(dto.RefreshToken);
+    const payload = await this.verifyRefreshToken(dto.refreshToken);
     const token = await this.prisma.refreshToken.findFirst({
-      where: { token: dto.RefreshToken },
+      where: { token: dto.refreshToken },
     });
 
     if (!token || token.expiredDate.getTime() <= Date.now()) {
@@ -97,8 +97,8 @@ export class AuthService {
     });
 
     return {
-      AccessToken: tokenPair.accessToken,
-      RefreshToken: tokenPair.refreshToken,
+      accessToken: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
     };
   }
 

@@ -20,8 +20,8 @@ export class TagsService {
   }
 
   async getAll(request: GetAllRequestDto): Promise<GetAllResponseDto<GetTagResponseDto>> {
-    const where = request.Name
-      ? { name: { contains: request.Name.trim(), mode: 'insensitive' as const } }
+    const where = request.name
+      ? { name: { contains: request.name.trim(), mode: 'insensitive' as const } }
       : {};
 
     const total = await this.prisma.tag.count({ where });
@@ -32,7 +32,7 @@ export class TagsService {
     const { skip, take } = getPaging(request);
     const entities = await this.prisma.tag.findMany({
       where,
-      orderBy: [{ name: sortDirection(request.SortBy) }],
+      orderBy: [{ name: sortDirection(request.sortBy) }],
       skip,
       take,
     });
@@ -54,24 +54,24 @@ export class TagsService {
   }
 
   async create(request: CreateTagRequestDto): Promise<void> {
-    await this.ensureNotExists(request.Name, request.IsGlobal);
+    await this.ensureNotExists(request.name, request.isGlobal);
     await this.prisma.tag.create({
       data: {
-        name: request.Name.trim(),
-        color: request.Color.trim(),
-        isGlobal: request.IsGlobal,
+        name: request.name.trim(),
+        color: request.color.trim(),
+        isGlobal: request.isGlobal,
       },
     });
   }
 
   async update(request: UpdateTagRequestDto): Promise<void> {
-    await this.ensureNotExists(request.Name, request.IsGlobal);
+    await this.ensureNotExists(request.name, request.isGlobal);
     await this.prisma.tag.update({
       where: { id: request.id },
       data: {
-        name: request.Name.trim(),
-        color: request.Color.trim(),
-        isGlobal: request.IsGlobal,
+        name: request.name.trim(),
+        color: request.color.trim(),
+        isGlobal: request.isGlobal,
       },
     });
   }
@@ -92,9 +92,9 @@ export class TagsService {
   private mapTag(entity: Tag): GetTagResponseDto {
     return {
       id: String(entity.id),
-      Name: entity.name,
-      Color: entity.color,
-      IsGlobal: entity.isGlobal,
+      name: entity.name,
+      color: entity.color,
+      isGlobal: entity.isGlobal,
     };
   }
 }
