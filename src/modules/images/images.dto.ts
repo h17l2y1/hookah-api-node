@@ -9,8 +9,9 @@ export class GetImageResponseDto {
 }
 
 export class CreateImageRequestDto {
+  @IsOptional()
   @IsString()
-  base64!: string;
+  base64?: string | null;
 
   @IsString()
   name!: string;

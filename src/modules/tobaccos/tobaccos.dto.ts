@@ -137,6 +137,8 @@ export class CreateTobaccoRequestDto {
 }
 
 export class UpdateTobaccoRequestDto {
+  @Type(() => Number)
+  @IsNumber()
   id!: number;
 
   @IsString()

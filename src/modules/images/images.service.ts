@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { DEFAULT_IMAGE_LINK } from '../../common/constants/default-image';
 import { PrismaService } from '../../database/prisma.service';
 import { ImageType } from '../../common/enums/image-type.enum';
 import { CreateImageRequestDto, GetImageResponseDto, UpdateImageRequestDto } from './images.dto';
@@ -23,7 +24,11 @@ export class ImagesService {
 
   async create(request: CreateImageRequestDto): Promise<void> {
     await this.prisma.image.create({
-      data: { name: request.name.trim(), link: request.base64.trim(), type: request.type },
+      data: {
+        name: request.name.trim(),
+        link: request.base64?.trim() ? request.base64.trim() : DEFAULT_IMAGE_LINK,
+        type: request.type,
+      },
     });
   }
 

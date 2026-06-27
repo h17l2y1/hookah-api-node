@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { GetAllRequestDto } from '../../common/dto/get-all-request.dto';
 import { GetAllResponseDto } from '../../common/dto/get-all-response.dto';
+import { DEFAULT_IMAGE_LINK } from '../../common/constants/default-image';
 import { ImageType } from '../../common/enums/image-type.enum';
 import { ImgurService } from '../../common/services/imgur.service';
 import { parseRequiredInt } from '../../common/utils/ids';
@@ -87,7 +88,9 @@ export class TobaccosService {
   }
 
   async create(request: CreateTobaccoRequestDto): Promise<void> {
-    const imageLink = await this.imgurService.uploadImage(request.name, request.image.base64);
+    const imageLink = request.image.base64?.trim()
+      ? await this.imgurService.uploadImage(request.name, request.image.base64)
+      : DEFAULT_IMAGE_LINK;
     const image = await this.prisma.image.create({
       data: {
         name: request.name.trim(),
