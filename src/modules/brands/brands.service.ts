@@ -34,8 +34,8 @@ export class BrandsService {
 
   async getAll(request: GetAllRequestDto): Promise<GetAllResponseDto<GetBrandResponseDto>> {
     const where = {
-      ...(request.Name ? { name: { contains: request.Name.trim(), mode: 'insensitive' as const } } : {}),
-      ...(request.CountryId ? { countryId: parseRequiredInt(request.CountryId) } : {}),
+      ...(request.name ? { name: { contains: request.name.trim(), mode: 'insensitive' as const } } : {}),
+      ...(request.countryId ? { countryId: parseRequiredInt(request.countryId) } : {}),
     };
 
     const total = await this.prisma.brand.count({ where });
@@ -47,7 +47,7 @@ export class BrandsService {
     const entities = await this.prisma.brand.findMany({
       where,
       include: { country: true, image: true, lines: true },
-      orderBy: [{ name: sortDirection(request.SortBy) }],
+      orderBy: [{ name: sortDirection(request.sortBy) }],
       skip,
       take,
     });
@@ -57,33 +57,33 @@ export class BrandsService {
 
   async getOptions(): Promise<GetBrandOptionDto[]> {
     const entities = await this.prisma.brand.findMany({ orderBy: { name: 'asc' } });
-    return entities.map((entity) => ({ id: entity.id, Name: entity.name }));
+    return entities.map((entity) => ({ id: entity.id, name: entity.name }));
   }
 
   async create(request: CreateBrandRequestDto): Promise<void> {
-    const imageLink = await this.imgurService.uploadImage(request.Name, request.Image.Base64);
+    const imageLink = await this.imgurService.uploadImage(request.name, request.image.base64);
     const image = await this.prisma.image.create({
       data: {
-        name: request.Name.trim(),
+        name: request.name.trim(),
         link: imageLink,
-        type: request.Image.Type,
+        type: request.image.type,
       },
     });
     const brand = await this.prisma.brand.create({
       data: {
-        name: request.Name.trim(),
-        description: request.Description ?? null,
-        countryId: parseRequiredInt(request.CountryId),
+        name: request.name.trim(),
+        description: request.description ?? null,
+        countryId: parseRequiredInt(request.countryId),
         imageId: image.id,
       },
       include: { image: true },
     });
 
-    if (request.Lines?.length) {
+    if (request.lines?.length) {
       await this.prisma.line.createMany({
-        data: request.Lines.filter((line) => line.Name?.trim()).map((line) => ({
-          name: line.Name!.trim(),
-          description: line.Description ?? null,
+        data: request.lines.filter((line) => line.name?.trim()).map((line) => ({
+          name: line.name!.trim(),
+          description: line.description ?? null,
           brandId: brand.id,
         })),
       });
@@ -100,15 +100,15 @@ export class BrandsService {
     }
 
     const imageUpdate: { name: string; link?: string; type?: ImageType } = {
-      name: request.Name.trim(),
+      name: request.name.trim(),
     };
-    if (request.Image.Base64) {
-      imageUpdate.link = await this.imgurService.uploadImage(request.Name, request.Image.Base64);
-    } else if (request.Image.Link) {
-      imageUpdate.link = request.Image.Link;
+    if (request.image.base64) {
+      imageUpdate.link = await this.imgurService.uploadImage(request.name, request.image.base64);
+    } else if (request.image.link) {
+      imageUpdate.link = request.image.link;
     }
-    if (request.Image.Type) {
-      imageUpdate.type = request.Image.Type;
+    if (request.image.type) {
+      imageUpdate.type = request.image.type;
     }
 
     await this.prisma.image.update({
@@ -119,29 +119,29 @@ export class BrandsService {
     await this.prisma.brand.update({
       where: { id: request.id },
       data: {
-        name: request.Name.trim(),
-        description: request.Description ?? null,
-        countryId: parseRequiredInt(request.CountryId),
+        name: request.name.trim(),
+        description: request.description ?? null,
+        countryId: parseRequiredInt(request.countryId),
       },
     });
 
-    const newLines = (request.Lines ?? []).filter((line) => line.IsNew);
+    const newLines = (request.lines ?? []).filter((line) => line.isNew);
     if (newLines.length) {
       await this.prisma.line.createMany({
         data: newLines.map((line) => ({
-          name: line.Name.trim(),
+          name: line.name.trim(),
           brandId: request.id,
         })),
       });
     }
 
-    const existingLines = (request.Lines ?? []).filter((line) => !line.IsNew && line.Id);
+    const existingLines = (request.lines ?? []).filter((line) => !line.isNew && line.id);
     for (const line of existingLines) {
       await this.prisma.line.update({
-        where: { id: parseRequiredInt(line.Id!) },
+        where: { id: parseRequiredInt(line.id!) },
         data: {
-          name: line.Name.trim(),
-          brandId: parseRequiredInt(line.BrandId),
+          name: line.name.trim(),
+          brandId: parseRequiredInt(line.brandId),
         },
       });
     }
@@ -154,19 +154,19 @@ export class BrandsService {
   private mapBrand(entity: Brand & { country: { id: number; name: string }; image: { id: number; name: string; link: string; type: string }; lines: Line[] }): GetBrandResponseDto {
     return {
       id: entity.id,
-      Name: entity.name,
-      Description: entity.description,
-      Country: { id: entity.country.id, Name: entity.country.name },
-      Image: {
+      name: entity.name,
+      description: entity.description,
+      country: { id: entity.country.id, name: entity.country.name },
+      image: {
         id: entity.image.id,
-        Name: entity.image.name,
-        Link: entity.image.link,
-        Type: entity.image.type as ImageType,
+        name: entity.image.name,
+        link: entity.image.link,
+        type: entity.image.type as ImageType,
       },
-      Lines: entity.lines.map((line) => ({
+      lines: entity.lines.map((line) => ({
         id: line.id,
-        Name: line.name,
-        BrandId: String(line.brandId),
+        name: line.name,
+        brandId: String(line.brandId),
       })),
     };
   }

@@ -1,13 +1,13 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
-import {Prisma} from '@prisma/client';
-import {GetAllRequestDto} from '../../common/dto/get-all-request.dto';
-import {GetAllResponseDto} from '../../common/dto/get-all-response.dto';
-import {parseRequiredInt} from '../../common/utils/ids';
-import {getPaging, sortDirection} from '../../common/utils/query';
-import {ImgurService} from '../../common/services/imgur.service';
-import {ImageType} from '../../common/enums/image-type.enum';
-import {PrismaService} from '../../database/prisma.service';
-import {CreateTobaccoRequestDto, GetTobaccoResponseDto, UpdateTobaccoRequestDto} from './tobaccos.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { GetAllRequestDto } from '../../common/dto/get-all-request.dto';
+import { GetAllResponseDto } from '../../common/dto/get-all-response.dto';
+import { ImageType } from '../../common/enums/image-type.enum';
+import { ImgurService } from '../../common/services/imgur.service';
+import { parseRequiredInt } from '../../common/utils/ids';
+import { getPaging, sortDirection } from '../../common/utils/query';
+import { PrismaService } from '../../database/prisma.service';
+import { CreateTobaccoRequestDto, GetTobaccoResponseDto, UpdateTobaccoRequestDto } from './tobaccos.dto';
 
 @Injectable()
 export class TobaccosService {
@@ -34,7 +34,7 @@ export class TobaccosService {
   }
 
   async getAll(request: GetAllRequestDto): Promise<GetAllResponseDto<GetTobaccoResponseDto>> {
-    const filterName = request.Name?.trim();
+    const filterName = request.name?.trim();
     const where: Prisma.TobaccoWhereInput = {
       ...(filterName
         ? {
@@ -44,11 +44,11 @@ export class TobaccosService {
             ],
           }
         : {}),
-      ...(request.TagId ? { tobaccoTags: { some: { tagId: parseRequiredInt(request.TagId) } } } : {}),
-      ...(request.BrandId ? { brandId: parseRequiredInt(request.BrandId) } : {}),
-      ...(request.CountryId ? { brand: { countryId: parseRequiredInt(request.CountryId) } } : {}),
-      ...(request.LineId ? { lineId: parseRequiredInt(request.LineId) } : {}),
-      ...(request.HeavinessId ? { heavinessId: parseRequiredInt(request.HeavinessId) } : {}),
+      ...(request.tagId ? { tobaccoTags: { some: { tagId: parseRequiredInt(request.tagId) } } } : {}),
+      ...(request.brandId ? { brandId: parseRequiredInt(request.brandId) } : {}),
+      ...(request.countryId ? { brand: { countryId: parseRequiredInt(request.countryId) } } : {}),
+      ...(request.lineId ? { lineId: parseRequiredInt(request.lineId) } : {}),
+      ...(request.heavinessId ? { heavinessId: parseRequiredInt(request.heavinessId) } : {}),
     };
 
     const total = await this.prisma.tobacco.count({ where });
@@ -65,7 +65,7 @@ export class TobaccosService {
         reviews: { include: { user: true } },
         tobaccoTags: { include: { tag: true } },
       },
-      orderBy: [{ [request.Column || 'name']: sortDirection(request.SortBy) }],
+      orderBy: [{ [request.column || 'name']: sortDirection(request.sortBy) }],
       skip,
       take,
     });
@@ -87,30 +87,30 @@ export class TobaccosService {
   }
 
   async create(request: CreateTobaccoRequestDto): Promise<void> {
-    const imageLink = await this.imgurService.uploadImage(request.Name, request.Image.Base64);
+    const imageLink = await this.imgurService.uploadImage(request.name, request.image.base64);
     const image = await this.prisma.image.create({
       data: {
-        name: request.Name.trim(),
+        name: request.name.trim(),
         link: imageLink,
-        type: request.Image.Type,
+        type: request.image.type,
       },
     });
     const tobacco = await this.prisma.tobacco.create({
       data: {
-        name: request.Name.trim(),
-        description: request.Description ?? null,
-        lineId: parseRequiredInt(request.LineId),
-        brandId: parseRequiredInt(request.BrandId),
-        heavinessId: parseRequiredInt(request.HeavinessId),
+        name: request.name.trim(),
+        description: request.description ?? null,
+        lineId: parseRequiredInt(request.lineId),
+        brandId: parseRequiredInt(request.brandId),
+        heavinessId: parseRequiredInt(request.heavinessId),
         imageId: image.id,
       },
     });
 
-    const tags = request.TobaccoTags ?? [];
+    const tags = request.tobaccoTags ?? [];
     if (tags.length) {
       await this.prisma.tobaccoTag.createMany({
         data: tags.map((item) => ({
-          tagId: parseRequiredInt(item.TagId),
+          tagId: parseRequiredInt(item.tagId),
           tobaccoId: tobacco.id,
         })),
       });
@@ -127,15 +127,15 @@ export class TobaccosService {
     }
 
     const imageUpdate: { name: string; link?: string; type?: ImageType } = {
-      name: request.Name.trim(),
+      name: request.name.trim(),
     };
-    if (request.Image.Base64) {
-      imageUpdate.link = await this.imgurService.uploadImage(request.Name, request.Image.Base64);
-    } else if (request.Image.Link) {
-      imageUpdate.link = request.Image.Link;
+    if (request.image.base64) {
+      imageUpdate.link = await this.imgurService.uploadImage(request.name, request.image.base64);
+    } else if (request.image.link) {
+      imageUpdate.link = request.image.link;
     }
-    if (request.Image.Type) {
-      imageUpdate.type = request.Image.Type;
+    if (request.image.type) {
+      imageUpdate.type = request.image.type;
     }
 
     if (entity.imageId) {
@@ -148,31 +148,31 @@ export class TobaccosService {
     await this.prisma.tobacco.update({
       where: { id: request.id },
       data: {
-        name: request.Name.trim(),
-        description: request.Description ?? null,
-        lineId: parseRequiredInt(request.LineId),
-        heavinessId: parseRequiredInt(request.HeavinessId),
-        brandId: parseRequiredInt(request.BrandId),
-        rating: request.Rating ?? entity.rating,
+        name: request.name.trim(),
+        description: request.description ?? null,
+        lineId: parseRequiredInt(request.lineId),
+        heavinessId: parseRequiredInt(request.heavinessId),
+        brandId: parseRequiredInt(request.brandId),
+        rating: request.rating ?? entity.rating,
       },
     });
 
-    const removedTags = request.TobaccoTags.filter((item) => item.IsRemoved);
+    const removedTags = request.tobaccoTags.filter((item) => item.isRemoved);
     for (const item of removedTags) {
       await this.prisma.tobaccoTag.deleteMany({
         where: {
-          ...(item.Id ? { id: parseRequiredInt(item.Id) } : {}),
-          ...(item.TagId ? { tagId: parseRequiredInt(item.TagId) } : {}),
+          ...(item.id ? { id: parseRequiredInt(item.id) } : {}),
+          ...(item.tagId ? { tagId: parseRequiredInt(item.tagId) } : {}),
           tobaccoId: request.id,
         },
       });
     }
 
-    const newTags = request.TobaccoTags.filter((item) => item.IsNew);
+    const newTags = request.tobaccoTags.filter((item) => item.isNew);
     if (newTags.length) {
       await this.prisma.tobaccoTag.createMany({
         data: newTags.map((item) => ({
-          tagId: parseRequiredInt(item.TagId),
+          tagId: parseRequiredInt(item.tagId),
           tobaccoId: request.id,
         })),
       });
@@ -185,50 +185,50 @@ export class TobaccosService {
 
   private mapTobacco(entity: any): GetTobaccoResponseDto {
     const reviews = (entity.reviews ?? []).map((review: any) => ({
-      TobaccoId: review.tobaccoId ? String(review.tobaccoId) : null,
-      MixId: review.mixId ? String(review.mixId) : null,
-      UserId: review.userId ?? null,
-      IsAnonymous: review.isAnonymous,
-      Rating: review.rating,
-      Comment: review.comment ?? null,
-      Name: review.isAnonymous ? (review.anonymousName ?? '') : `${review.user?.firstName ?? ''} ${review.user?.lastName ?? ''}`.trim(),
-      CreationDate: review.creationDate,
+      tobaccoId: review.tobaccoId ? String(review.tobaccoId) : null,
+      mixId: review.mixId ? String(review.mixId) : null,
+      userId: review.userId ?? null,
+      isAnonymous: review.isAnonymous,
+      rating: review.rating,
+      comment: review.comment ?? null,
+      name: review.isAnonymous ? (review.anonymousName ?? '') : `${review.user?.firstName ?? ''} ${review.user?.lastName ?? ''}`.trim(),
+      creationDate: review.creationDate,
     }));
     const tags = (entity.tobaccoTags ?? []).map((item: any) => ({
       id: String(item.tag.id),
-      Name: item.tag.name,
-      Color: item.tag.color,
-      IsGlobal: item.tag.isGlobal,
+      name: item.tag.name,
+      color: item.tag.color,
+      isGlobal: item.tag.isGlobal,
     }));
 
     return {
       id: entity.id,
-      Name: entity.name,
-      Description: entity.description,
-      LineId: String(entity.lineId),
-      BrandId: String(entity.brandId),
-      HeavinessId: String(entity.heavinessId),
-      Rating: entity.rating,
-      RatingCount: reviews.length,
-      CommentsCount: reviews.filter((review: any) => review.Comment != null).length,
-      Image: entity.image
+      name: entity.name,
+      description: entity.description,
+      lineId: String(entity.lineId),
+      brandId: String(entity.brandId),
+      heavinessId: String(entity.heavinessId),
+      rating: entity.rating,
+      ratingCount: reviews.length,
+      commentsCount: reviews.filter((review: any) => review.comment != null).length,
+      image: entity.image
         ? {
             id: entity.image.id,
-            Name: entity.image.name,
-            Link: entity.image.link,
-            Type: entity.image.type,
+            name: entity.image.name,
+            link: entity.image.link,
+            type: entity.image.type,
           }
         : null,
-      Brand: entity.brand ? { id: entity.brand.id, Name: entity.brand.name } : null,
-      Tags: tags,
-      TobaccoTags: (entity.tobaccoTags ?? []).map((item: any) => ({
-        Id: String(item.id),
-        TagId: String(item.tagId),
-        TobaccoId: String(item.tobaccoId),
-        IsNew: false,
-        IsRemoved: false,
+      brand: entity.brand ? { id: entity.brand.id, name: entity.brand.name } : null,
+      tags,
+      tobaccoTags: (entity.tobaccoTags ?? []).map((item: any) => ({
+        id: String(item.id),
+        tagId: String(item.tagId),
+        tobaccoId: String(item.tobaccoId),
+        isNew: false,
+        isRemoved: false,
       })),
-      Reviews: reviews,
+      reviews,
     };
   }
 }
