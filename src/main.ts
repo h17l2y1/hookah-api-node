@@ -7,7 +7,12 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({
+      bodyLimit: 50 * 1024 * 1024,
+    }),
+  );
 
   const allowedOrigins = new Set(
     [
@@ -34,6 +39,14 @@ async function bootstrap() {
       callback(new Error(`CORS blocked for origin: ${origin}`), false);
     },
     credentials: true,
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+      'Origin',
+    ],
   });
 
   app.useGlobalPipes(

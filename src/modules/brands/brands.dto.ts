@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsInt,
   IsOptional,
   IsString,
   ValidateNested,
@@ -76,6 +77,8 @@ export class CreateBrandRequestDto {
 }
 
 export class UpdateBrandRequestDto {
+  @Type(() => Number)
+  @IsInt()
   id!: number;
 
   @IsString()
