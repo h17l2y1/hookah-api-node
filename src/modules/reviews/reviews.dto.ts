@@ -1,4 +1,5 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class GetReviewResponseDto {
   tobaccoId?: string | null;
@@ -12,9 +13,19 @@ export class GetReviewResponseDto {
 }
 
 export class CreateReviewRequestDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
   tobaccoId?: number | null;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
   mixId?: number | null;
-  userId?: number | null;
+
+  @IsOptional()
+  @IsString()
+  userId?: string | null;
 
   @IsOptional()
   @IsString()
