@@ -9,8 +9,30 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
 
+  const allowedOrigins = new Set(
+    [
+      'http://localhost:4200',
+      'https://localhost:4200',
+      'http://127.0.0.1:4200',
+      'https://127.0.0.1:4200',
+      process.env.CORS_ORIGIN,
+    ].filter((origin): origin is string => Boolean(origin)),
+  );
+
   app.enableCors({
-    origin: true,
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (allowedOrigins.has(origin) || origin.endsWith('.onrender.com')) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`CORS blocked for origin: ${origin}`), false);
+    },
     credentials: true,
   });
 
