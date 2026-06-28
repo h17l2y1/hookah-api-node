@@ -154,6 +154,13 @@ model Review {
   anonymousName String?  @map("AnonymousName")
   isAnonymous  Boolean  @map("IsAnonymous")
   rating       Float    @map("Rating")
+  sweetness    Float    @default(0) @map("Sweetness")
+  sourness     Float    @default(0) @map("Sourness")
+  freshness    Float    @default(0) @map("Freshness")
+  flavorBrightness Float @default(0) @map("FlavorBrightness")
+  strength     Float    @default(0) @map("Strength")
+  heatResistance Float  @default(0) @map("HeatResistance")
+  smokiness    Float    @default(0) @map("Smokiness")
   comment      String?  @map("Comment")
   creationDate DateTime @default(now()) @map("CreationDate")
 

@@ -7,17 +7,45 @@ export class ReviewsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(request: CreateReviewRequestDto): Promise<void> {
-    const review = await this.prisma.review.create({
-      data: {
-        tobaccoId: request.tobaccoId ?? null,
-        mixId: request.mixId ?? null,
-        userId: request.userId ? String(request.userId) : null,
-        anonymousName: request.name ?? null,
-        isAnonymous: request.isAnonymous,
-        rating: request.rating,
-        comment: request.comment ?? null,
+    const targetWhere = request.tobaccoId != null
+      ? { tobaccoId: request.tobaccoId }
+      : { mixId: request.mixId };
+    const identityWhere = request.userId
+      ? { userId: String(request.userId) }
+      : { anonymousName: request.name ?? null };
+
+    const existingReview = await this.prisma.review.findFirst({
+      where: {
+        ...targetWhere,
+        ...identityWhere,
       },
     });
+
+    const reviewData = {
+      tobaccoId: request.tobaccoId ?? null,
+      mixId: request.mixId ?? null,
+      userId: request.userId ? String(request.userId) : null,
+      anonymousName: request.name ?? null,
+      isAnonymous: request.isAnonymous,
+      rating: request.rating,
+      sweetness: request.sweetness ?? 0,
+      sourness: request.sourness ?? 0,
+      freshness: request.freshness ?? 0,
+      flavorBrightness: request.flavorBrightness ?? 0,
+      strength: request.strength ?? 0,
+      heatResistance: request.heatResistance ?? 0,
+      smokiness: request.smokiness ?? 0,
+      comment: request.comment ?? null,
+    };
+
+    const review = existingReview
+      ? await this.prisma.review.update({
+        where: { id: existingReview.id },
+        data: reviewData,
+      })
+      : await this.prisma.review.create({
+        data: reviewData,
+      });
 
     if (request.tobaccoId != null) {
       await this.updateTobaccoRating(request.tobaccoId);
