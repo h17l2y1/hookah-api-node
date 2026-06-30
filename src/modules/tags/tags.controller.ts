@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseArrayPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TagsService } from './tags.service';
-import { CreateTagRequestDto, UpdateTagRequestDto } from './tags.dto';
+import { CreateTagRequestDto, TagImportResultDto, UpdateTagRequestDto } from './tags.dto';
 import { GetAllRequestDto } from '../../common/dto/get-all-request.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -36,6 +36,16 @@ export class TagsController {
   @Put('Update')
   update(@Body() request: UpdateTagRequestDto) {
     return this.service.update(request);
+  }
+
+  @ApiBearerAuth('bearer')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Post('Import')
+  import(
+    @Body(new ParseArrayPipe({ items: CreateTagRequestDto })) request: CreateTagRequestDto[],
+  ): Promise<TagImportResultDto> {
+    return this.service.import(request);
   }
 
   @ApiBearerAuth('bearer')

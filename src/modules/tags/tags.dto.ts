@@ -30,3 +30,9 @@ export class UpdateTagRequestDto {
   @IsBoolean()
   isGlobal!: boolean;
 }
+
+export class TagImportResultDto {
+  totalCount!: number;
+  createdCount!: number;
+  skippedCount!: number;
+}

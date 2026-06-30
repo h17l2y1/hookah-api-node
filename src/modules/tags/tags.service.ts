@@ -4,7 +4,7 @@ import { GetAllRequestDto } from '../../common/dto/get-all-request.dto';
 import { GetAllResponseDto } from '../../common/dto/get-all-response.dto';
 import { PrismaService } from '../../database/prisma.service';
 import { getPaging, sortDirection } from '../../common/utils/query';
-import { CreateTagRequestDto, GetTagResponseDto, UpdateTagRequestDto } from './tags.dto';
+import { CreateTagRequestDto, GetTagResponseDto, TagImportResultDto, UpdateTagRequestDto } from './tags.dto';
 
 @Injectable()
 export class TagsService {
@@ -64,6 +64,47 @@ export class TagsService {
     });
   }
 
+  async import(requests: CreateTagRequestDto[]): Promise<TagImportResultDto> {
+    const normalizedRequests = requests.map((request) => ({
+      name: request.name.trim(),
+      color: request.color.trim(),
+      isGlobal: request.isGlobal,
+    })).filter((request) => request.name.length > 0 && request.color.length > 0);
+
+    if (!normalizedRequests.length) {
+      throw new BadRequestException('No valid tags provided');
+    }
+
+    const uniqueRequests = this.uniqueByKey(normalizedRequests);
+    const existingTags = await this.prisma.tag.findMany({
+      where: {
+        OR: uniqueRequests.map((request) => ({
+          name: request.name,
+          isGlobal: request.isGlobal,
+        })),
+      },
+      select: {
+        name: true,
+        isGlobal: true,
+      },
+    });
+
+    const existingKeys = new Set(existingTags.map((tag) => this.getTagKey(tag.name, tag.isGlobal)));
+    const tagsToCreate = uniqueRequests.filter((request) => !existingKeys.has(this.getTagKey(request.name, request.isGlobal)));
+
+    if (tagsToCreate.length) {
+      await this.prisma.tag.createMany({
+        data: tagsToCreate,
+      });
+    }
+
+    return {
+      totalCount: requests.length,
+      createdCount: tagsToCreate.length,
+      skippedCount: requests.length - tagsToCreate.length,
+    };
+  }
+
   async update(request: UpdateTagRequestDto): Promise<void> {
     await this.ensureNotExists(request.name, request.isGlobal);
     await this.prisma.tag.update({
@@ -96,5 +137,22 @@ export class TagsService {
       color: entity.color,
       isGlobal: entity.isGlobal,
     };
+  }
+
+  private uniqueByKey(requests: Array<{ name: string; color: string; isGlobal: boolean }>): Array<{ name: string; color: string; isGlobal: boolean }> {
+    const seen = new Set<string>();
+    return requests.filter((request) => {
+      const key = this.getTagKey(request.name, request.isGlobal);
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+  }
+
+  private getTagKey(name: string, isGlobal: boolean): string {
+    return `${name}::${isGlobal ? '1' : '0'}`;
   }
 }
