@@ -1,4 +1,5 @@
-import { IsBoolean, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class GetTagResponseDto {
   id?: string | null;
@@ -18,7 +19,21 @@ export class CreateTagRequestDto {
   isGlobal!: boolean;
 }
 
+export class ImportTagRequestDto {
+  @IsString()
+  name!: string;
+
+  @IsString()
+  color!: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isGlobal?: boolean;
+}
+
 export class UpdateTagRequestDto {
+  @Type(() => Number)
+  @IsInt()
   id!: number;
 
   @IsString()

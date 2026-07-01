@@ -4,7 +4,7 @@ import { GetAllRequestDto } from '../../common/dto/get-all-request.dto';
 import { GetAllResponseDto } from '../../common/dto/get-all-response.dto';
 import { PrismaService } from '../../database/prisma.service';
 import { getPaging, sortDirection } from '../../common/utils/query';
-import { CreateTagRequestDto, GetTagResponseDto, TagImportResultDto, UpdateTagRequestDto } from './tags.dto';
+import { CreateTagRequestDto, GetTagResponseDto, ImportTagRequestDto, TagImportResultDto, UpdateTagRequestDto } from './tags.dto';
 
 @Injectable()
 export class TagsService {
@@ -64,11 +64,11 @@ export class TagsService {
     });
   }
 
-  async import(requests: CreateTagRequestDto[]): Promise<TagImportResultDto> {
+  async import(requests: ImportTagRequestDto[]): Promise<TagImportResultDto> {
     const normalizedRequests = requests.map((request) => ({
       name: request.name.trim(),
       color: request.color.trim(),
-      isGlobal: request.isGlobal,
+      isGlobal: request.isGlobal ?? false,
     })).filter((request) => request.name.length > 0 && request.color.length > 0);
 
     if (!normalizedRequests.length) {
@@ -106,9 +106,10 @@ export class TagsService {
   }
 
   async update(request: UpdateTagRequestDto): Promise<void> {
-    await this.ensureNotExists(request.name, request.isGlobal);
+    const normalizedId = Number(request.id);
+    await this.ensureNotExists(request.name, request.isGlobal, normalizedId);
     await this.prisma.tag.update({
-      where: { id: request.id },
+      where: { id: normalizedId },
       data: {
         name: request.name.trim(),
         color: request.color.trim(),
@@ -118,12 +119,28 @@ export class TagsService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.prisma.tag.delete({ where: { id } });
+    const tag = await this.prisma.tag.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+
+    if (!tag) {
+      throw new NotFoundException(`${id} doesn't exist`);
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.tobaccoTag.deleteMany({ where: { tagId: id } }),
+      this.prisma.tag.delete({ where: { id } }),
+    ]);
   }
 
-  private async ensureNotExists(name: string, isGlobal: boolean): Promise<void> {
+  private async ensureNotExists(name: string, isGlobal: boolean, excludeId?: number): Promise<void> {
     const exists = await this.prisma.tag.findFirst({
-      where: { name: name.trim(), isGlobal },
+      where: {
+        name: name.trim(),
+        isGlobal,
+        ...(excludeId !== undefined ? { id: { not: excludeId } } : {}),
+      },
     });
     if (exists) {
       throw new BadRequestException(`Tag ${name} already exist`);
